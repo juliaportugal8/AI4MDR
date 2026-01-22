@@ -1,0 +1,12 @@
+[OK] IEC 62304 (SW lifecycle) → Medical device software -- Software life cycle processes (COMPRÁMOS- FCTUC)
+[OK] ISO 14971 (risk management) → Medical devices. Application of risk management to medical devices (TENHO)
+[OK] ISO 13485/2016 (quality management system) → Medical devices - Quality management systems - Requirements for regulatory purposes (TENHO)
+
+[NOK] ISO/TR 14969 → guidance on the use of ISO 13485/2003 (now obsolete?) => este TENHO
+
+
+IEC 62366 (usability engineering) → Medical devices - Application of usability engineering to medical devices → só tenho PREVIEW
+
+
+PD IEC/TR 80002-1 - Medical device software Part 1: Guidance on the application of ISO 14971 (RISK) to medical device software
+BSI PAS 277: 2015 Health and wellness apps. Quality criteria across the life cycle. Code of practice
