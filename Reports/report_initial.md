@@ -9,7 +9,7 @@ Its purpose is to consolidate the main concepts, definitions, and normative requ
 
 ## 2. Regulatory Qualification of Medical Device Software
 
-
+..
 ## 3. Regulatory and Process Foundations for Medical Device Software
 
 ### 3.1 Lifecycle-Oriented Regulatory Framework
