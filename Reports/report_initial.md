@@ -53,3 +53,4 @@ Problem resolution requires formal problem reports, classification of severity, 
 The informative annexes of IEC 62304 provide interpretative guidance and clarify the relationship between lifecycle requirements and other standards. In particular, Annex C highlights the integration of IEC 62304 with ISO 13485 (Quality Management Systems) and ISO 14971 (Risk Management), reinforcing that software lifecycle control operates within a broader regulatory structure.
 
 This contextual integration confirms that compliance with IEC 62304 is not isolated but interconnected with overarching quality and safety management frameworks.
+|
