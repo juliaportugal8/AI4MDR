@@ -7,10 +7,12 @@
 This report documents the initial phase of theoretical and regulatory study undertaken within the scope of the AI4MDR project.
 Its purpose is to consolidate the main concepts, definitions, and normative requirements identified in the literature reviewed during this stage, with particular emphasis on medical device software lifecycle processes, safety classification, risk-related obligations, and documentation and traceability expectations. The content presented here supports the subsequent structuring of the state-of-the-art review and provides a grounded basis for later methodological and technical decisions.
 
+## 2. Regulatory Qualification of Medical Device Software
 
-## 2. Regulatory and Process Foundations for Medical Device Software
 
-### 2.1 Lifecycle-Oriented Regulatory Framework
+## 3. Regulatory and Process Foundations for Medical Device Software
+
+### 3.1 Lifecycle-Oriented Regulatory Framework
 
 Medical device software operates within a highly regulated environment in which safety and effectiveness must be demonstrated through structured and documented processes. IEC 62304 establishes a lifecycle-based framework defining processes, activities, and tasks required for the development and maintenance of medical device software (IEC 62304:2006).
 
@@ -18,7 +20,7 @@ The standard is built on the premise that software safety cannot be assured sole
 
 Development is presumed to occur within a Quality Management System (QMS) and in coordination with a Risk Management System, typically aligned with ISO 14971. This integration highlights that software development is embedded within a broader regulatory and quality ecosystem rather than functioning as an isolated engineering activity.
 
-### 2.2 Software Safety Classification and Risk Assumptions
+### 3.2 Software Safety Classification and Risk Assumptions
 
 A core structural element of the standard is software safety classification. Software is categorised according to the potential consequences of failure on patients, operators, or other users:
 
@@ -32,7 +34,7 @@ A critical principle states that when a hazard may arise from software malfuncti
 
 The assigned safety class must be documented within the Risk Management File and may only be reduced if risk is demonstrably mitigated (e.g., through hardware risk control measures), with appropriate justification.
 
-### 2.3 Traceability and Documentation Requirements
+### 3.3 Traceability and Documentation Requirements
 
 Traceability emerges as a recurring and structurally central requirement. Requirements must be uniquely identifiable, testable, consistent, and linked to system requirements and risk control measures. Verification activities must demonstrate correct implementation of requirements, and test results must be formally documented (IEC 62304:2006).
 
@@ -40,7 +42,7 @@ Traceability is not limited to requirements and tests. It extends across archite
 
 The standard allows flexibility in implementation methods; however, when requirements are deemed “not applicable” or “as appropriate,” documented justification is required.
 
-### 2.4 Maintenance, Configuration Management and Problem Resolution
+### 3.4 Maintenance, Configuration Management and Problem Resolution
 
 Maintenance is treated as a formal lifecycle process rather than a secondary phase. Post-release feedback must be monitored and evaluated for safety impact. Any modification must follow structured change control procedures, including impact assessment and verification before re-release.
 
