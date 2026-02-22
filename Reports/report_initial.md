@@ -8,8 +8,18 @@ This report documents the initial phase of theoretical and regulatory study unde
 Its purpose is to consolidate the main concepts, definitions, and normative requirements identified in the literature reviewed during this stage, with particular emphasis on medical device software lifecycle processes, safety classification, risk-related obligations, and documentation and traceability expectations. The content presented here supports the subsequent structuring of the state-of-the-art review and provides a grounded basis for later methodological and technical decisions.
 
 ## 2. Regulatory Qualification of Medical Device Software
+The regulatory qualification of software constitutes the first essential step before applying any lifecycle or safety standard. In the European Union, the determination of whether software qualifies as a Medical Device Software (MDSW) is governed by Regulation (EU) 2017/745 (MDR), Regulation (EU) 2017/746 (IVDR), and further clarified by MDCG 2019-11 guidance.
 
-..
+A medical device is  any instrument, apparatus, appliance, software, implant, reagent, material or other article intended by the manufacturer to be used for specific medical purposes, including diagnosis, prevention, monitoring, prediction, prognosis, treatment or alleviation of disease. Therefore, qualification depends primarily on the intended purpose defined by the manufacturer.
+The European Commission guidance “Is your software a Medical Device?” provides a structured decision process to determine whether software qualifies as Medical Device Software (MDSW). The assessment focuses on three main criteria.
+
+First, the product must qualify as software under MDCG 2019-11 and perform actions on data beyond mere storage, communication, or basic search functions. Software that only stores or transfers data does not qualify as MDSW.
+
+Second, the software must generate or transform medical information, such as through analysis, interpretation, or calculation supporting clinical decisions.
+
+Third, the intended benefit must relate to individual patients and medical objectives. Software used solely for administrative, regulatory, or general purposes does not meet the definition.
+
+If these conditions are satisfied, the software qualifies as Medical Device Software and falls under MDR or IVDR, depending on its intended purpose.
 ## 3. Regulatory and Process Foundations for Medical Device Software
 
 ### 3.1 Lifecycle-Oriented Regulatory Framework
