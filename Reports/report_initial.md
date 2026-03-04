@@ -116,3 +116,128 @@ IEC 62304 operates within a network of harmonised standards and regulatory instr
 This integration demonstrates that medical device software compliance is inherently multi-layered. Legal conformity under MDR establishes overarching obligations. Process conformity under IEC 62304 structures development activities. Risk governance under ISO 14971 ensures systematic hazard control. Organisational governance under ISO 13485 ensures that responsibilities, documentation, and quality oversight are institutionally embedded.
 
 Medical device software development must therefore be understood as part of a cohesive compliance architecture rather than as a standalone technical activity. Safety, quality, and regulatory conformity are structurally intertwined across the entire lifecycle.
+
+## 4. Software Engineering – A Quantitative Approach  
+
+The regulatory framework presented in the previous chapter defines *what* must be ensured in medical device software development. However, it does not fully describe *how* engineering practices should be structured to achieve quality in a measurable and sustainable manner.  
+
+The book *Software Engineering – A Quantitative Approach* provides a structured workflow that frames software development as an engineering discipline grounded in measurable quality, controlled processes, and continuous feedback. Rather than treating development as a purely creative activity, it positions it as a systematic process driven by explicit requirements, architectural decisions, automation, and empirical metrics.
+
+This section summarises the key engineering principles most relevant to regulated medical software contexts.
+
+
+### 4.1 Requirements as the Primary Quality Driver  
+
+The book emphasises that requirements determine the fate of a software project. They drive development, define architecture, influence planning, and ultimately serve as the criteria for evaluating product quality. 
+
+A structured requirements process includes:
+
+- Understanding and formalising the problem.
+- Surveying existing solutions.
+- Eliciting requirements from stakeholders.
+- Documenting functional and non-functional requirements.
+- Converting problem-domain requirements into solution-domain specifications.
+- Validating them through acceptance testing.
+
+The critical insight is that requirements lie at the intersection between the problem domain and the solution domain. Poorly defined requirements propagate ambiguity into architecture and implementation.
+
+The book also highlights the growing role of LLMs in supporting requirement specification and validation, particularly for checking consistency, unambiguity, and structural correctness. However, it cautions that LLMs cannot replace disciplined engineering judgment.
+
+This emphasis on requirement clarity aligns directly with regulatory traceability expectations under IEC 62304.
+
+
+### 4.2 Architecture Driven by Quality Attributes  
+
+Software architecture is described as the high-level structural blueprint of a system. Its importance lies not only in organizing code but in enabling emergent system properties.
+
+The book distinguishes three main requirement categories at system level:
+
+- Functional requirements;
+- Quality attributes;
+- Constraints.
+
+Quality attributes such as availability, maintainability, usability, performance, and security are not properties of isolated code fragments but emergent properties of the system architecture.  
+
+For example, high availability cannot be attributed to a specific function; it results from architectural strategies such as redundancy, failover mechanisms, and load balancing.
+
+Architecturally Significant Requirements (ASRs) are those functional requirements that have broad structural implications. These must be identified early, as they heavily constrain architectural design.
+
+This architectural perspective is especially relevant in safety-critical systems, where quality attributes are often regulatory obligations rather than optional enhancements.
+
+
+### 4.3 Construction, Testing, and the V-Model  
+
+The book structures development around the V-model, where the left side focuses on specification and design, and the right side on verification and validation.
+
+Construction is described as the pivot stage: it transforms architectural design into executable code while embedding quality assurance practices such as Test-Driven Development (TDD).
+
+Testing is not treated as a final activity but as a continuous practice across multiple levels:
+
+- Unit testing (code-level verification)
+- Integration testing (component interaction)
+- System testing (end-to-end validation)
+- Acceptance testing (validation of client requirements)
+
+Functional system tests are extracted directly from product requirements and executed in environments that mimic real-world usage conditions.
+
+The book also highlights the synergy between Behaviour-Driven Development (BDD) and TDD, linking requirements to executable tests. This reinforces the feedback loop between specification and implementation.
+
+In regulated environments, this structured testing hierarchy naturally supports traceability and verification evidence generation.
+
+
+
+### 4.4 Automation and Continuous Integration  
+
+Automation is presented as a core enabling practice to increase productivity, consistency, and defect detection.
+
+Rather than manually executing repetitive tasks, automation scripts orchestrate:
+
+- Test execution  
+- Static code analysis  
+- Security checks  
+- Complexity measurement  
+- Deployment  
+
+Continuous Integration (CI) pipelines embed these automated checks into every commit. This increases the probability of detecting defects immediately after introduction.
+
+Automation extends beyond testing to Infrastructure as Code (IaC), enabling reproducible environments and controlled deployments.
+
+From a quantitative perspective, automation transforms quality assurance into a measurable and repeatable process rather than a subjective evaluation.
+
+
+### 4.5 DevOps and Quantitative Metrics  
+
+The DevOps philosophy closes the development loop by incorporating monitoring and feedback from production environments.
+
+Mature DevOps teams adopt measurable performance indicators, notably the DORA metrics:
+
+- Deployment Frequency (DF)
+- Lead Time for Changes (LT)
+- Change Failure Rate (CFR)
+- Mean Time to Restore (MTTR)
+
+These metrics quantify delivery performance, stability, and resilience.
+
+The quantitative approach emphasises that quality cannot be assumed; it must be measured. Metrics enable objective reflection on process performance and continuous improvement.
+
+
+
+### 4.6 Roles, Accountability, and Quality Governance  
+
+Engineering discipline is also organisational. The book defines explicit roles such as Product Quality Manager, Tester, and Developer, each with defined responsibilities for quality assurance and defect management.
+
+Clear accountability structures reduce ambiguity and prevent quality degradation caused by role overlap or lack of ownership.
+
+This structured responsibility mapping is particularly relevant in regulated environments where independence of verification activities may be required.
+
+
+### 4.7 Synthesis  
+
+The quantitative approach to software engineering frames development as:
+
+- A feedback-driven process  
+- A measurable quality system  
+- An architecture-centered discipline  
+- A continuously improving workflow  
+
+In safety-critical and regulated domains such as medical device software, these principles align naturally with regulatory expectations. Quantification, automation, structured verification, and documented accountability provide the engineering foundation upon which regulatory compliance can reliably be built.
