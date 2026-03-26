@@ -100,4 +100,3 @@ and analysis of regulatory standards relevant to medical device software certifi
  (fazer no fim do projeto)
 
 # 2 State of Art
-#

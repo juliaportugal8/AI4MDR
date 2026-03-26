@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-his report documents the initial phase of theoretical and regulatory study undertaken within the scope of the AI4MDR project. Its purpose is to consolidate and critically structure the main regulatory, normative, and engineering concepts identified in the literature reviewed during this stage.
+This report documents the initial phase of theoretical and regulatory study undertaken within the scope of the AI4MDR project. Its purpose is to consolidate and critically structure the main regulatory, normative, and engineering concepts identified in the literature reviewed during this stage.
 
 Beyond summarising standards and regulations, this review clarifies the systemic interdependencies between regulatory qualification, lifecycle governance, safety classification, risk management obligations, documentation requirements, and engineering practices. In the medical device domain, compliance is not achieved through isolated technical artefacts but through demonstrable process integrity across the entire lifecycle.
 
@@ -21,13 +21,13 @@ Additionally, Recital 19 MDR explicitly clarifies that software specifically int
 Further clarification is provided by the MDCG guidance document “Is your software a Medical Device?” (MDCG 2019-11).
 The guidance establishes a structured decision framework based on three cumulative criteria:
 
-Software Qualification
+Software Qualification:
 The product must qualify as software according to MDCG 2019-11 and perform actions beyond mere storage, archival, communication, or simple search.
 
-Medical Data Processing
+Medical Data Processing:
 The software must generate, transform, analyse, or interpret medical data. Software that merely stores or transmits data does not qualify as MDSW.
 
-Medical Purpose for Individual Patients
+Medical Purpose for Individual Patients:
 The intended benefit must relate to specific medical objectives for individual patients. Administrative, lifestyle, or general well-being applications fall outside MDR scope.
 If these criteria are satisfied, the software qualifies as Medical Device Software (MDSW) and falls under MDR or IVDR, depending on whether it relates to general medical devices or in vitro diagnostic applications.
 
