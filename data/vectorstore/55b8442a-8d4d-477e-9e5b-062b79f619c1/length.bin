@@ -1,0 +1,12 @@
+9.8 Test documentation contents
+When testing, retesting or REGRESSION TESTING SOFTWARE ITEMS and SYSTEMS following a
+change, the MANUFACTURER shall include in the test documentation:
+a) test results;
+b)
+ANOMALIES found;
+c) the VERSION of software tested;
+d) relevant hardware and software test configurations;
+e) relevant test tools;
+f) date tested; and
+g) identification of the tester.
+[Class A, B, 
