@@ -1,12 +1,9 @@
 #Here, lets teste just the retrieval part to see if the system finds the right excerpts
 
-# Import the Chroma vector store
+# Here, let's test just the retrieval part to see if the system finds the right excerpts
+
 from langchain_chroma import Chroma
-
-# Import the local embedding model from Ollama
 from langchain_ollama import OllamaEmbeddings
-
-# Import the Document class so we can rebuild parent documents
 from langchain_core.documents import Document
 
 
@@ -15,10 +12,8 @@ def load_vectorstore(persist_directory="data/vectorstore"):
     Load the existing vector store from disk.
     """
 
-    # Use the same embedding model used to build the vector store
     embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
-    # Load the persisted Chroma database
     vectorstore = Chroma(
         persist_directory=persist_directory,
         embedding_function=embeddings
@@ -34,7 +29,6 @@ def retrieve_relevant_child_chunks(question, k=5):
 
     vectorstore = load_vectorstore()
 
-    # Search the vector store using semantic similarity
     results = vectorstore.similarity_search(question, k=k)
 
     return results
@@ -43,11 +37,6 @@ def retrieve_relevant_child_chunks(question, k=5):
 def group_chunks_by_parent(child_chunks):
     """
     Group retrieved child chunks by parent_id.
-
-    Returns a dictionary:
-    {
-        parent_id: [chunk1, chunk2, ...]
-    }
     """
 
     grouped = {}
@@ -66,20 +55,13 @@ def group_chunks_by_parent(child_chunks):
 def reconstruct_parent_context(grouped_chunks):
     """
     Reconstruct parent-level context from retrieved child chunks.
-
-    For now, this function combines the child chunks belonging to the same parent.
-    Later, this can be upgraded to retrieve full stored parent documents if needed.
-
-    Returns a list of reconstructed parent documents.
     """
 
     parent_documents = []
 
     for parent_id, chunks in grouped_chunks.items():
-        # Use metadata from the first chunk as representative metadata
         metadata = chunks[0].metadata.copy()
 
-        # Combine all child chunk texts belonging to the same parent
         combined_text = "\n\n".join(chunk.page_content for chunk in chunks)
 
         parent_doc = Document(
@@ -103,30 +85,35 @@ def reconstruct_parent_context(grouped_chunks):
     return parent_documents
 
 
+def select_top_parent_documents(parent_documents, max_parents=2):
+    """
+    Keep only the top N parent documents.
+
+    Assumes that earlier documents are more relevant.
+    """
+
+    return parent_documents[:max_parents]
+
+
 def query_vectorstore(question, k=5):
     """
     Full parent-child retrieval pipeline:
     1. retrieve relevant child chunks
     2. group them by parent
     3. reconstruct parent context
+    4. select top parent documents
     """
 
     child_chunks = retrieve_relevant_child_chunks(question, k=k)
     grouped = group_chunks_by_parent(child_chunks)
     parent_documents = reconstruct_parent_context(grouped)
 
-    return child_chunks, parent_documents
+    top_parents = select_top_parent_documents(parent_documents)
+
+    return child_chunks, top_parents
 
 
 if __name__ == "__main__":
-    """
-    Test block:
-    - ask a question
-    - retrieve relevant child chunks
-    - reconstruct parent-level context
-    - print both results
-    """
-
     question = "What does IEC 62304 say about software maintenance?"
 
     print(f"Question: {question}\n")
@@ -143,7 +130,7 @@ if __name__ == "__main__":
         print(chunk.page_content[:500])
         print("\n")
 
-    print(f"\nNumber of reconstructed parent documents: {len(parent_documents)}\n")
+    print(f"\nNumber of selected parent documents: {len(parent_documents)}\n")
 
     for i, parent in enumerate(parent_documents, start=1):
         print(f"--- Parent document {i} ---")

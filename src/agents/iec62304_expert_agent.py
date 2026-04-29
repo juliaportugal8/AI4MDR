@@ -1,4 +1,5 @@
 from langchain_ollama import OllamaLLM
+
 from src.retrieval.query_vectorstore import query_vectorstore
 
 
@@ -17,7 +18,7 @@ def build_context(parent_documents):
         page_end = doc.metadata.get("page_label_end", "unknown")
 
         context_part = f"""
-[Section {section_id} - {section_title}]
+[IEC 62304 - Section {section_id} - {section_title}]
 Pages: {page_start} to {page_end}
 
 {doc.page_content}
@@ -32,9 +33,12 @@ def generate_answer(question, context):
     Generate an answer using only the retrieved IEC 62304 context.
     """
 
+    if not context.strip():
+        return "I could not find this information in the provided context."
+
     llm = OllamaLLM(model="llama3.2:1b")
 
-    prompt = prompt = f"""
+    prompt = f"""
 You are an expert assistant specialized in IEC 62304.
 
 You MUST follow ALL rules strictly.
@@ -51,15 +55,20 @@ Use EXACTLY this format:
 
 5. Your answer MUST follow this structure:
 
-- Start with:
+Start with:
 "According to IEC 62304 (Section X.X, Page Y):"
 
-- Then provide a bullet-point list of requirements.
+Then provide a bullet-point list ONLY with requirements explicitly stated in the context.
+Do not summarize beyond the retrieved text.
+Do not add interpretation, motivation, or general software engineering advice.
+Each bullet point MUST end with the citation (Section X.X, Page Y).
 
-- Each bullet point MUST end with a citation:
-(Section X.X, Page Y)
+Each bullet point must:
+- be a complete sentence
+- end with the citation in this exact format: (Section X.X, Page Y)
+- not place the citation on a separate line
 
-6. Do NOT write malformed references (e.g., "Ic e6.1").
+6. Do NOT write malformed references.
 7. Do NOT omit the page number.
 
 Context:
@@ -86,6 +95,9 @@ def ask_iec62304(question):
 
     child_chunks, parent_documents = query_vectorstore(question, k=5)
 
+    if not parent_documents:
+        return "I could not find this information in the provided context."
+
     context = build_context(parent_documents)
 
     answer = generate_answer(question, context)
@@ -94,7 +106,6 @@ def ask_iec62304(question):
 
 
 if __name__ == "__main__":
-    #Example question 
     question = "What does IEC 62304 say about software maintenance?"
 
     print(f"Question: {question}\n")

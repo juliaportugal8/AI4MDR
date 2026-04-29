@@ -1,6 +1,7 @@
-# Purpose of this file: To import the PDF pages and attempt to group them into sections of the standard.
+# Purpose of this file: Import PDF pages and group them into section-level parent documents.
+
 import re
-from typing import List
+from typing import List, Optional, Tuple
 
 from langchain_core.documents import Document
 
@@ -14,7 +15,7 @@ def keep_english_pages(documents: List[Document]) -> List[Document]:
     For this bilingual PDF:
     - French and English pages alternate
     - English pages are generally odd page labels
-    - the main normative body is approximately from page 17 to page 65
+    - the main normative body is approximately from page 17 to page 67
     """
 
     english_docs = []
@@ -27,11 +28,9 @@ def keep_english_pages(documents: List[Document]) -> List[Document]:
             try:
                 label = int(page_label)
 
-                # Keep only the main normative body for now
                 if label < 17 or label > 67:
                     continue
 
-                # Keep only English pages
                 if label % 2 == 1:
                     english_docs.append(doc)
 
@@ -40,11 +39,10 @@ def keep_english_pages(documents: List[Document]) -> List[Document]:
             except ValueError:
                 pass
 
-        # Fallback if page_label is not available
         if page_index is not None:
             human_page = page_index + 1
 
-            if human_page < 17 or human_page > 65:
+            if human_page < 17 or human_page > 67:
                 continue
 
             if human_page % 2 == 1:
@@ -193,7 +191,7 @@ def is_top_level_heading(line: str) -> bool:
     return re.match(pattern, line) is not None
 
 
-def extract_section_id_and_title(line: str):
+def extract_section_id_and_title(line: str) -> Tuple[str, str]:
     """
     Extract section id and title.
 
@@ -214,13 +212,29 @@ def extract_section_id_and_title(line: str):
     return "unknown", line
 
 
+def safe_page_label(page_label) -> Optional[int]:
+    """
+    Convert PDF page_label metadata into an integer when possible.
+    """
+
+    if page_label is None:
+        return None
+
+    try:
+        return int(page_label)
+    except ValueError:
+        return None
+
+
 def make_parent_document(
     section_id: str,
     section_title: str,
     section_text: List[str],
-    page_start,
-    page_end,
-    source
+    page_start: Optional[int],
+    page_end: Optional[int],
+    page_label_start: Optional[int],
+    page_label_end: Optional[int],
+    source: Optional[str],
 ) -> Document:
     """
     Build a LangChain Document representing one parent section.
@@ -234,11 +248,13 @@ def make_parent_document(
             "section_title": section_title,
             "page_start": page_start,
             "page_end": page_end,
-            "page_label_start": page_start + 1 if isinstance(page_start, int) else None,
-            "page_label_end": page_end + 1 if isinstance(page_end, int) else None,
+            "page_label_start": page_label_start,
+            "page_label_end": page_label_end,
             "source": source,
+            "standard": "IEC 62304",
             "language": "en",
             "document_part": "main_normative_body",
+            "document_type": "standard_section",
         },
     )
 
@@ -260,13 +276,17 @@ def parse_sections(documents: List[Document]) -> List[Document]:
     current_section_id = None
     current_section_title = None
     current_section_text = []
+
     current_page_start = None
     current_page_end = None
+    current_page_label_start = None
+    current_page_label_end = None
     current_source = None
 
     for doc in english_docs:
         page_text = doc.page_content
         page_index = doc.metadata.get("page")
+        page_label = safe_page_label(doc.metadata.get("page_label"))
         source = doc.metadata.get("source")
 
         lines = page_text.splitlines()
@@ -289,14 +309,19 @@ def parse_sections(documents: List[Document]) -> List[Document]:
                             current_section_text,
                             current_page_start,
                             current_page_end,
+                            current_page_label_start,
+                            current_page_label_end,
                             current_source,
                         )
                     )
 
                 current_section_id, current_section_title = extract_section_id_and_title(line)
                 current_section_text = [line]
+
                 current_page_start = page_index
                 current_page_end = page_index
+                current_page_label_start = page_label
+                current_page_label_end = page_label
                 current_source = source
 
             elif is_top_level_heading(line):
@@ -308,6 +333,8 @@ def parse_sections(documents: List[Document]) -> List[Document]:
                             current_section_text,
                             current_page_start,
                             current_page_end,
+                            current_page_label_start,
+                            current_page_label_end,
                             current_source,
                         )
                     )
@@ -315,14 +342,18 @@ def parse_sections(documents: List[Document]) -> List[Document]:
                 current_section_id = None
                 current_section_title = None
                 current_section_text = []
+
                 current_page_start = None
                 current_page_end = None
+                current_page_label_start = None
+                current_page_label_end = None
                 current_source = None
 
             else:
                 if current_section_id is not None:
                     current_section_text.append(line)
                     current_page_end = page_index
+                    current_page_label_end = page_label
 
     if current_section_id is not None and current_section_text:
         sections.append(
@@ -332,6 +363,8 @@ def parse_sections(documents: List[Document]) -> List[Document]:
                 current_section_text,
                 current_page_start,
                 current_page_end,
+                current_page_label_start,
+                current_page_label_end,
                 current_source,
             )
         )
