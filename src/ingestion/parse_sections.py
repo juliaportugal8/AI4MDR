@@ -28,7 +28,7 @@ def keep_english_pages(documents: List[Document]) -> List[Document]:
             try:
                 label = int(page_label)
 
-                if label < 17 or label > 67:
+                if label < 11 or label > 67:
                     continue
 
                 if label % 2 == 1:
@@ -149,18 +149,28 @@ def is_section_heading(line: str) -> bool:
     Examples:
     - 1.1 * Purpose
     - 5.1 * Software development planning
-    - 6.2 * Problem and modification analysis
+    - 3.33  (standalone number, title on next line)
     """
 
     line = normalize_line(line)
 
-    if not is_valid_section_title(line):
+    if is_toc_or_noise_line(line):
         return False
 
-    pattern = r"^\d+\.\d+\s+\*?\s*[A-Z].+"
+    if looks_like_table_heading(line):
+        return False
 
-    return re.match(pattern, line) is not None
+    # Standard format: "1.1 * Purpose" or "5.1 Software development planning"
+    standard_pattern = r"^\d+\.\d+\s+\*?\s*[A-Z].+"
+    if re.match(standard_pattern, line):
+        return True
 
+    # Standalone number format: "3.33" (definitions section)
+    standalone_pattern = r"^\d+\.\d+$"
+    if re.match(standalone_pattern, line):
+        return True
+
+    return False
 
 def is_top_level_heading(line: str) -> bool:
     """
@@ -191,22 +201,29 @@ def is_top_level_heading(line: str) -> bool:
     return re.match(pattern, line) is not None
 
 
-def extract_section_id_and_title(line: str) -> Tuple[str, str]:
+def extract_section_id_and_title(line: str, next_line: str = "") -> Tuple[str, str]:
     """
     Extract section id and title.
 
-    Example:
-    "6.2 * Problem and modification analysis"
-    -> ("6.2", "Problem and modification analysis")
+    Examples:
+    "6.2 * Problem and modification analysis" -> ("6.2", "Problem and modification analysis")
+    "3.33" + next_line "VERIFICATION"         -> ("3.33", "VERIFICATION")
     """
 
     line = normalize_line(line)
 
+    # Standard format: number + title on same line
     match = re.match(r"^(\d+\.\d+)\s+\*?\s*(.+)", line)
-
     if match:
         section_id = match.group(1).strip()
         section_title = match.group(2).strip()
+        return section_id, section_title
+
+    # Standalone number: title is on the next line
+    match = re.match(r"^(\d+\.\d+)$", line)
+    if match:
+        section_id = match.group(1).strip()
+        section_title = normalize_line(next_line) if next_line else "unknown"
         return section_id, section_title
 
     return "unknown", line
@@ -292,7 +309,11 @@ def parse_sections(documents: List[Document]) -> List[Document]:
         lines = page_text.splitlines()
 
         for raw_line in lines:
+            lines = page_text.splitlines()
+
+        for i, raw_line in enumerate(lines):
             line = normalize_line(raw_line)
+            next_line = normalize_line(lines[i + 1]) if i + 1 < len(lines) else ""
 
             if not line:
                 continue

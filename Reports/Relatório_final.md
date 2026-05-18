@@ -4,13 +4,13 @@
 
 ## Abstract
 
-## Resumo
+## Resume
 
 ## 1 Introduction
 ### 1.1 Context and Motivation
 ### 1.2 Objectives
 ### 1.3 Previous Work
-###  1.4 Contributions
+### 1.4 Contributions
 
 ## 2 State of the Art
 ### 2.1 Medical Device Regulation (MDR)

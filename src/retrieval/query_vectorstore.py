@@ -22,14 +22,42 @@ def load_vectorstore(persist_directory="data/vectorstore"):
     return vectorstore
 
 
-def retrieve_relevant_child_chunks(question, k=5):
+def retrieve_relevant_child_chunks(question, k=15):
     """
-    Retrieve the k most relevant child chunks for a given question.
+    Retrieve relevant child chunks using semantic search.
+    For definition questions, also search by keyword directly.
     """
-
     vectorstore = load_vectorstore()
 
+    # Semantic search
     results = vectorstore.similarity_search(question, k=k)
+
+    # If the question looks like a definition request, also search by keyword
+    definition_triggers = ["define", "definition", "what is", "what does", "meaning of"]
+    q = question.lower()
+
+    if any(trigger in q for trigger in definition_triggers):
+        # Extract the key term from the question
+        words = question.upper().split()
+        candidate_terms = [w.strip('?"\'') for w in words if w.isupper() and len(w) > 3]
+
+        keyword_docs = []
+        for term in candidate_terms:
+            try:
+                keyword_results = vectorstore.get(
+                    where={"section_title": term}
+                )
+
+                if keyword_results["documents"]:
+                    existing_ids = {r.metadata.get("child_chunk_id") for r in results}
+                    for doc_text, meta in zip(keyword_results["documents"], keyword_results["metadatas"]):
+                        extra_doc = Document(page_content=doc_text, metadata=meta)
+                        if meta.get("child_chunk_id") not in existing_ids:
+                            keyword_docs.append(extra_doc)
+            except Exception as e:
+                pass
+
+        results = keyword_docs + results
 
     return results
 
@@ -77,6 +105,7 @@ def reconstruct_parent_context(grouped_chunks):
                 "source": metadata.get("source"),
                 "language": metadata.get("language"),
                 "reconstructed_from_children": True,
+                "chunk_count": len(chunks),
             },
         )
 
@@ -85,17 +114,17 @@ def reconstruct_parent_context(grouped_chunks):
     return parent_documents
 
 
-def select_top_parent_documents(parent_documents, max_parents=2):
+def select_top_parent_documents(parent_documents, max_parents=4):
     """
-    Keep only the top N parent documents.
-
-    Assumes that earlier documents are more relevant.
+    Keep only the top N parent documents ranked by chunk_count descending.
+    Sections found by keyword search are prepended before semantic results,
+    so stable sort preserves their priority when chunk counts are equal.
     """
+    sorted_docs = sorted(parent_documents, key=lambda d: d.metadata.get("chunk_count", 1), reverse=True)
+    return sorted_docs[:max_parents]
 
-    return parent_documents[:max_parents]
 
-
-def query_vectorstore(question, k=5):
+def query_vectorstore(question, k=15):
     """
     Full parent-child retrieval pipeline:
     1. retrieve relevant child chunks
@@ -105,6 +134,7 @@ def query_vectorstore(question, k=5):
     """
 
     child_chunks = retrieve_relevant_child_chunks(question, k=k)
+
     grouped = group_chunks_by_parent(child_chunks)
     parent_documents = reconstruct_parent_context(grouped)
 
@@ -114,11 +144,11 @@ def query_vectorstore(question, k=5):
 
 
 if __name__ == "__main__":
-    question = "What does IEC 62304 say about software maintenance?"
+    question = "VERIFICATION definition in IEC 62304"
 
     print(f"Question: {question}\n")
 
-    child_chunks, parent_documents = query_vectorstore(question, k=5)
+    child_chunks, parent_documents = query_vectorstore(question, k=15)
 
     print(f"Number of retrieved child chunks: {len(child_chunks)}\n")
 
@@ -139,3 +169,11 @@ if __name__ == "__main__":
         print("\nContent preview:")
         print(parent.page_content[:1000])
         print("\n")
+
+    # Verificar se 3.33 existe no vectorstore
+    print("\n--- Checking if 3.33 VERIFICATION exists in vectorstore ---")
+    vectorstore = load_vectorstore()
+    results = vectorstore.get(where={"section_id": "3.33"})
+    print(f"Documents found with section_id 3.33: {len(results['ids'])}")
+    if results['documents']:
+        print("Content:", results['documents'][0])

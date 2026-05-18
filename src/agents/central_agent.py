@@ -1,97 +1,185 @@
-from langchain.agents import create_agent
-from langchain_core.tools import tool
-from langchain_ollama import ChatOllama
+from langchain_ollama import OllamaLLM
 
 from src.agents.iec62304_expert_agent import ask_iec62304
+from src.agents.evaluation_agent import run_evaluation
+from src.ingestion.load_pdf import load_pdf
+from src.ingestion.parse_sections import parse_sections
 
 
-@tool
-def iec62304_expert_tool(question: str) -> str:
+PDF_PATH = "data/raw/IEC_62304_2006_en_fr_.pdf"
+
+# Memory to store the last question and answer
+conversation_memory = {
+    "last_question": None,
+    "last_answer": None,
+}
+
+
+def classify_message(user_message):
     """
-    Use this tool to answer questions about IEC 62304, medical device software,
-    software lifecycle processes, software maintenance, risk management,
-    configuration management, testing, release, and problem resolution.
-    """
-    return ask_iec62304(question)
+    Simple deterministic routing.
 
-
-def create_central_agent():
-    """
-    Create the central AI4MDR agent.
-
-    The central agent can:
-    - answer normal conversational messages directly
-    - call the IEC 62304 expert tool when needed
-    - refuse questions outside its current scope
+    Since this assistant is specialized in IEC 62304:
+    - simple conversation -> chitchat
+    - document structure questions -> structure
+    - evaluation request -> evaluate
+    - everything else -> IEC 62304 expert agent
     """
 
-    model = ChatOllama(model="llama3.2:1b")
+    q = user_message.lower().strip()
 
-    system_prompt = """
-You are the AI4MDR central assistant.
+    # Reject very short or meaningless input
+    words = [w for w in q.split() if len(w) > 1]
+    if len(q) < 4 or len(words) == 0:
+        return "chitchat"
 
-You are a helpful AI assistant, but your technical knowledge is currently limited to IEC 62304
-and medical device software regulation.
+    chitchat_terms = [
+        "hello",
+        "hi",
+        "hey",
+        "thank you",
+        "thanks",
+        "obrigada",
+        "obrigado",
+    ]
 
-You have access to one specialist tool:
-- iec62304_expert_tool
+    if any(term in q for term in chitchat_terms):
+        has_question = "?" in user_message or any(
+            word in q for word in ["how", "what", "when", "where", "why", "which", "define", "explain", "list"]
+        )
+        if not has_question:
+            return "chitchat"
 
-Use the IEC 62304 expert tool ONLY when the user asks about:
-- IEC 62304
-- medical device software
-- software lifecycle processes
-- software development
-- software maintenance
-- software risk management
-- software configuration management
-- software testing
-- software release
-- software problem resolution
-- regulatory evidence for medical device software
+    structure_terms = [
+        "how many sections",
+        "number of sections",
+        "list sections",
+        "list the sections",
+        "extracted sections",
+        "document structure",
+        "how is the document organized",
+    ]
 
-For normal conversation, such as greetings, thanks, or short social messages, respond naturally yourself.
-Do not call the tool for greetings or casual conversation.
+    if any(term in q for term in structure_terms):
+        return "structure"
 
-If the user asks something outside your current scope, politely say that you cannot answer it at the moment
-and that you can currently help with IEC 62304-related questions.
+    compare_terms = [
+        "compara a resposta",
+        "compare the answer",
+        "compare your answer",
+        "compare the answer",
+        "how accurate was",
+        "evaluate your answer",
+        "avalia a resposta",
+    ]
 
-Do not invent IEC 62304 content yourself. For IEC 62304 questions, use the tool.
+    if any(term in q for term in compare_terms):
+        return "evaluate"
+
+    return "iec62304"
+
+
+def answer_chitchat(user_message):
+    """
+    Answer normal conversational messages.
+    """
+
+    llm = OllamaLLM(model="mistral")
+
+    prompt = f"""
+You are a helpful assistant.
+Respond briefly and naturally.
+
+User message:
+{user_message}
+
+Answer:
 """
 
-    agent = create_agent(
-        model=model,
-        tools=[iec62304_expert_tool],
-        system_prompt=system_prompt,
-    )
-
-    return agent
+    return llm.invoke(prompt).strip()
 
 
-def get_last_ai_message(response):
+def answer_structure_question(user_message):
     """
-    Extract the final assistant message from the agent response.
+    Answer questions about the extracted structure of IEC 62304.
     """
 
-    messages = response.get("messages", [])
+    docs = load_pdf(PDF_PATH)
+    sections = parse_sections(docs)
 
-    if not messages:
-        return "I could not generate a response."
+    # Group by top-level section
+    top_level = {}
+    for doc in sections:
+        section_id = doc.metadata.get("section_id", "")
+        top = section_id.split(".")[0]
+        if top not in top_level:
+            top_level[top] = []
+        top_level[top].append(
+            f"  {section_id} - {doc.metadata.get('section_title')}"
+        )
 
-    last_message = messages[-1]
+    structure_lines = []
+    for top, subsections in sorted(top_level.items(), key=lambda x: int(x[0])):
+        structure_lines.append(f"Section {top}:")
+        structure_lines.extend(subsections)
 
-    if hasattr(last_message, "content"):
-        return last_message.content
+    llm = OllamaLLM(model="mistral")
 
-    return str(last_message)
+    prompt = f"""
+You are answering a question about the structure of IEC 62304.
+
+The document has {len(top_level)} top-level sections (1 through {max(int(k) for k in top_level.keys())}).
+It has {len(sections)} subsections in total.
+
+Structure:
+{chr(10).join(structure_lines)}
+
+User question:
+{user_message}
+
+Answer clearly. Distinguish between top-level sections and subsections if relevant.
+Do not invent sections.
+"""
+
+    return llm.invoke(prompt).strip()
+
+
+def central_agent(user_message):
+    """
+    Main routing function. Classifies the message and calls the appropriate handler.
+    """
+
+    label = classify_message(user_message)
+
+    if label == "evaluate":
+        if conversation_memory["last_question"] is None:
+            return {"answer": "No previous answer to evaluate. Please ask a question first.", "sources": [], "route": "evaluate"}
+        report = run_evaluation(
+            conversation_memory["last_question"],
+            conversation_memory["last_answer"]
+        )
+        return {"answer": report, "sources": [], "route": "evaluate"}
+
+    if label == "chitchat":
+        return {"answer": answer_chitchat(user_message), "sources": [], "route": "chitchat"}
+
+    if label == "structure":
+        answer = answer_structure_question(user_message)
+        conversation_memory["last_question"] = user_message
+        conversation_memory["last_answer"] = answer
+        return {"answer": answer, "sources": [], "route": "structure"}
+
+    if label == "iec62304":
+        answer, sources = ask_iec62304(user_message)
+        conversation_memory["last_question"] = user_message
+        conversation_memory["last_answer"] = answer
+        return {"answer": answer, "sources": sources, "route": "iec62304"}
 
 
 def run_chat():
     """
     Interactive terminal chat.
     """
-
-    agent = create_central_agent()
-    conversation_history = []
 
     print("Hello. How can I help you?\n")
 
@@ -106,31 +194,11 @@ def run_chat():
             print("Please write a question.")
             continue
 
-        conversation_history.append(
-            {
-                "role": "user",
-                "content": user_message,
-            }
-        )
-
-        response = agent.invoke(
-            {
-                "messages": conversation_history
-            }
-        )
-
-        answer = get_last_ai_message(response)
+        result = central_agent(user_message)
 
         print("\nAssistant:")
-        print(answer)
+        print(result["answer"])
         print()
-
-        conversation_history.append(
-            {
-                "role": "assistant",
-                "content": answer,
-            }
-        )
 
 
 if __name__ == "__main__":

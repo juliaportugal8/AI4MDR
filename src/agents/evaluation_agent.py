@@ -1,6 +1,5 @@
 import json
-from difflib import SequenceMatcher
-from langchain_ollama import OllamaLLM
+from langchain_ollama import OllamaLLM, OllamaEmbeddings
 
 
 QUESTIONS_PATH = "data/evaluation/questions.json"
@@ -12,35 +11,52 @@ def load_reference_answers():
         return json.load(f)
 
 
+def cosine_similarity(vec1, vec2):
+    """
+    Calculate cosine similarity between two vectors.
+    Returns a value between 0 and 1 (1 = identical meaning).
+    """
+    dot_product = sum(a * b for a, b in zip(vec1, vec2))
+    magnitude1 = sum(a ** 2 for a in vec1) ** 0.5
+    magnitude2 = sum(b ** 2 for b in vec2) ** 0.5
+
+    if magnitude1 == 0 or magnitude2 == 0:
+        return 0.0
+
+    return dot_product / (magnitude1 * magnitude2)
+
+
 def find_reference_answer(question):
     """
-    Find the reference answer for a given question.
-    Uses fuzzy matching to handle slight wording differences.
-    Returns the reference answer string, or None if not found.
+    Find the reference answer for a given question using semantic similarity.
+    Uses nomic-embed-text embeddings to compare meaning, not exact words.
+    Returns the best matching entry, or None if no good match is found.
     """
     references = load_reference_answers()
 
+    embeddings_model = OllamaEmbeddings(model="nomic-embed-text")
+
+    # Embed the user question
+    question_embedding = embeddings_model.embed_query(question)
+
     best_match = None
     best_score = 0.0
-    #find the right query in the JSON file
+
     for entry in references:
-        score = SequenceMatcher(
-            None,
-            question.lower().strip(),
-            entry["question"].lower().strip()
-        ).ratio()
+        reference_embedding = embeddings_model.embed_query(entry["question"])
+        score = cosine_similarity(question_embedding, reference_embedding)
 
         if score > best_score:
             best_score = score
             best_match = entry
 
-    # Only accept if similarity is above 60%
-    if best_score >= 0.6:
+    # Accept if semantic similarity is above 75%
+    if best_score >= 0.75:
         return best_match
-    
+
     return None
 
-# Rate it on a scale of 0 to 10. And since it’s an LLM, it understands the meaning of the text, not the exact words.
+
 def evaluate_answers(question, agent_answer, reference_answer):
     """
     Use the LLM to compare the agent answer with the reference answer.
@@ -91,8 +107,6 @@ def run_evaluation(question, agent_answer):
         return "This question is not in the evaluation file. No comparison available."
 
     reference_answer = match["reference_answer"]
-
-    print(f"\n[Evaluating against reference: {match['id']} - {match['question']}]\n")
 
     report = evaluate_answers(question, agent_answer, reference_answer)
 

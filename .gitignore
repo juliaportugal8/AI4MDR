@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.venv-1/
+*.egg-info/
+
+# Vectorstore (binary files, rebuilt locally)
+data/vectorstore/
+
+# Conversations (user data, not source code)
+data/conversations/
+
+# Temporary files
+*.tmp*
