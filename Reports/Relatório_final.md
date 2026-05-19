@@ -1,102 +1,146 @@
 # AI4MDR: Agentic AI for Medical Device Regulation Certification
 
+**Author:** Júlia Bastos | julia.portugal@student.dei.uc.pt  
+**Supervisor:** Mário Zenha-Rela | mzrela@dei.uc.pt  
+**Project in Biomedical Engineering — Bachelor's Degree, 2025/2026**  
+**University of Coimbra, Department of Informatics Engineering**
+
+---
+
 ## Acknowledgments
+
+*(to be written at the end of the project)*
+
+---
 
 ## Abstract
 
-## Resume
+*(to be written at the end of the project)*
 
-## 1 Introduction
-### 1.1 Context and Motivation
-### 1.2 Objectives
-### 1.3 Previous Work
-### 1.4 Contributions
+---
 
-## 2 State of the Art
-### 2.1 Medical Device Regulation (MDR)
-### 2.2 Medical Device Software
-### 2.3 ISO/IEC 62304
-### 2.4 Artificial Intelligence for Regulatory Support
-### 2.5 Research Gap
-(talvez não vá ficar com esta estrutura o state of aart)
+## Resumo
 
-## 3 Methodology
-### 3.1 System Overview
-### 3.2 Knowledge Base Construction
-### 3.3 Retrieval-Augmented Generation (RAG)
-### 3.4 Agent Design
-( por definir)
+*(to be written at the end of the project)*
 
-
-## 4 Results and Discussion
-### 4.1 Experimental Setup
-### 4.2 Evaluation Results
-### 4.3 Discussion
-(por definir)
-
-## 5 Conclusion and Future Work
-
-## Appendix A
-
-
+---
 
 # 1 Introduction
 
 ## 1.1 Context and Motivation
 
-Software has become an essential component of modern medical devices, supporting a wide range of clinical and diagnostic applications.
-As the role of software in healthcare continues to grow, ensuring the safety, reliability, and compliance of these systems has become increasingly important. 
-In the European Union, medical devices must comply with strict regulatory frameworks that establish safety, performance, and documentation requirements. In addition to these requirements, software developed for medical purposes must follow specific engineering standards, which define the software lifecycle processes for medical devices. These regulations and standards require extensive documentation, traceability, and verification activities throughout the development process. As a result, the certification workflow can be complex, time-consuming, and highly dependent on manual analysis of technical and regulatory documents.
+Software has become an essential component of modern medical devices, supporting a wide range of clinical and diagnostic applications. As the role of software in healthcare continues to grow, ensuring the safety, reliability, and compliance of these systems has become increasingly important.
 
-Recent advances in artificial intelligence, particularly large language models (LLMs), offer new possibilities for supporting knowledge-intensive tasks such as document analysis and information retrieval. These technologies can support users in analyzing complex regulatory structures and identifying relevant requirements more efficiently.
+In the European Union, medical devices must comply with strict regulatory frameworks that govern their safety, performance, and documentation requirements. The Medical Device Regulation (EU MDR 2017/745) establishes the legal basis for placing medical devices on the European market, and explicitly requires that software developed for medical purposes follows well-defined engineering standards throughout its lifecycle. In particular, the ISO/IEC 62304 standard defines the software lifecycle processes for medical device software, specifying requirements for planning, development, verification, maintenance, and risk management.
 
-This project is motivated by the potential to combine artificial intelligence techniques with regulatory knowledge.
+Compliance with these frameworks requires extensive documentation, traceability of development activities, and systematic verification at every stage of the software lifecycle. In practice, this translates into complex and time-consuming workflows that are highly dependent on manual analysis of technical and legal documents. Developers and certification engineers must navigate large, dense regulatory texts, identify applicable requirements, and produce the corresponding evidence, a process that is both cognitively demanding and prone to human error.
 
+Recent advances in artificial intelligence, particularly large language models (LLMs), offer new possibilities for supporting knowledge-intensive tasks such as document analysis, information retrieval, and regulatory interpretation. These technologies have demonstrated strong performance in tasks involving complex textual reasoning, and have begun to be explored in domains such as legal compliance and requirements engineering. However, their application to the specific regulatory frameworks governing medical device software remains largely unexplored.
+
+This project is motivated by the potential to combine artificial intelligence techniques with domain-specific regulatory knowledge, with the goal of developing a system capable of supporting the interpretation and exploration of the requirements defined in the MDR and ISO/IEC 62304.
 
 ## 1.2 Objectives
 
-The main objective of this project is to explore the potential of
-agentic artificial intelligence to support the certification process
-of medical device software within the context of the European
-Medical Device Regulation (MDR).
+The main objective of this project is to explore the potential of agentic artificial intelligence to support the certification process of medical device software within the context of the European Medical Device Regulation (MDR).
 
 More specifically, this project aims to:
 
-- study the regulatory framework associated with medical device software, particularly the MDR and the ISO/IEC 62304 standard;
+- study the regulatory framework associated with medical device software, particularly the EU MDR and the ISO/IEC 62304 standard, and understand their structure, requirements, and implications for software development;
 
-- analyse the challenges associated with the interpretation and management of regulatory documentation;
+- analyse the challenges associated with the interpretation and management of regulatory documentation in the context of medical device software certification;
 
-- investigate how artificial intelligence techniques, particularly large language models, can support the analysis and interpretation
-of regulatory requirements;
+- investigate how artificial intelligence techniques, particularly large language models and retrieval-augmented generation, can support the analysis and interpretation of regulatory requirements;
 
-- develop a prototype system for the exploration and retrieval of information from regulatory standards relevant to medical device
-software certification;
+- design and develop a prototype multi-agent system capable of retrieving and interpreting information from regulatory standards relevant to medical device software certification;
 
-- assess the potential and limitations of this approach as a tool to support the understanding and exploration of regulatory
-requirements. 
+- assess the potential and limitations of this approach as a decision-support tool for understanding and exploring regulatory requirements.
 
+## 1.3 Contributions
 
-## 1.3 Previous Work
+*(to be written at the end of the project)*
 
+---
 
-Regulatory compliance has become an important topic within the field of software engineering, particularly in areas where software
-must adhere to strict legal and regulatory frameworks. Several research efforts have explored methods to support compliance
-analysis and requirements verification through automated or semi-automated approaches.
+# 2 Background
 
-Early work in this area focused on extracting regulatory requirements from legal and policy documents using natural language processing (NLP) techniques and traditional machine learning methods. These approaches aimed to assist developers in identifying relevant obligations and ensuring that software requirements aligned with regulatory constraints.
+## 2.1 Medical Device Regulation (EU MDR)
 
-More recently, advances in artificial intelligence, particularly large language models (LLMs), have enabled new approaches for analyzing complex textual documents. Some studies have explored the use of LLMs and retrieval-based techniques to support
-compliance checking, document analysis, and the identification of inconsistencies in software requirements. These approaches show
-promising results in domains such as privacy regulation and general legal compliance.
+*(to be written)*
 
-However, the application of these techniques to the regulatory frameworks governing medical device software remains limited.
-Standards such as the Medical Device Regulation (MDR) and ISO/IEC 62304 introduce highly specialized requirements and
-documentation processes that have not yet been widely explored in the context of AI-assisted compliance analysis.
+## 2.2 Medical Device Software and ISO/IEC 62304
 
-This project aims to contribute to this area by exploring how artificial intelligence techniques may support the interpretation
-and analysis of regulatory standards relevant to medical device software certification.
+*(to be written)*
 
-## 1.4 Contributions
- (fazer no fim do projeto)
+## 2.3 Large Language Models and Retrieval-Augmented Generation
 
-# 2 State of Art
+*(to be written)*
+
+---
+
+# 3 State of the Art
+
+## 3.1 NLP and AI for Regulatory Compliance
+
+*(to be written)*
+
+## 3.2 RAG in Regulatory and Healthcare Domains
+
+*(to be written)*
+
+## 3.3 Research Gap
+
+*(to be written)*
+
+---
+
+# 4 Methodology
+
+## 4.1 System Overview
+
+*(to be written)*
+
+## 4.2 Knowledge Base Construction
+
+*(to be written)*
+
+## 4.3 Retrieval-Augmented Generation Pipeline
+
+*(to be written)*
+
+## 4.4 Agent Architecture
+
+*(to be written)*
+
+---
+
+# 5 Evaluation
+
+## 5.1 Experimental Setup
+
+*(to be written)*
+
+## 5.2 Results
+
+*(to be written)*
+
+## 5.3 Discussion
+
+*(to be written)*
+
+---
+
+# 6 Conclusion and Future Work
+
+*(to be written)*
+
+---
+
+## References
+
+*(to be written)*
+
+---
+
+## Appendix A
+
+*(to be written)*
