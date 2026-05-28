@@ -15,3 +15,23 @@ data/conversations/
 
 # Temporary files
 *.tmp*
+
+# Reports
+Reports/
+
+# Meeting minutes and readings (not source code)
+Meeting minutes/
+Readings/
+
+# PDF documents
+*.pdf
+
+# CI/CD config (GitLab-specific)
+.gitlab-ci.yml
+
+# VS Code settings
+.vscode/
+
+# Course files / scratch scripts
+lca-lc-foundations
+testes_curso.py
